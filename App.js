@@ -1,18 +1,25 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, Button, TextInput } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  TextInput,
+  ScrollView,
+  FlatList
+} from "react-native";
+
+import GoalItem from "./components/GoalItem";
+import GoalInput from "./components/GoalInput";
 
 export default function App() {
-  const [enteredGoal, setEnteredGoal] = useState("");
   const [courseGoals, setCourseGoals] = useState([]);
 
-  const goalInputHandler = enteredText => {
-    setEnteredGoal(enteredText);
-  };
-
-  const addGoalHandler = () => {
-    setCourseGoals([...courseGoals, enteredGoal]);
-    console.log(enteredGoal + " " + "was added");
-    goalInputHandler("");
+  const addGoalHandler = enteredGoal => {
+    setCourseGoals([
+      ...courseGoals,
+      { id: Math.random().toString(), value: enteredGoal }
+    ]);
   };
 
   return (
@@ -20,23 +27,12 @@ export default function App() {
       <View style={styles.title}>
         <Text style={styles.titleBold}>To Do List</Text>
       </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="Course Goal"
-          style={styles.input}
-          onChangeText={goalInputHandler}
-          value={enteredGoal}
-        />
-        <Button title="Add" onPress={addGoalHandler} />
-      </View>
-
-      <View>
-        {courseGoals.map(goal => (
-          <View key={goal} style={styles.listItem}>
-            <Text>{goal}</Text>
-          </View>
-        ))}
-      </View>
+      <GoalInput addButton={addGoalHandler} />
+      <FlatList
+        keyExtractor={(item, index) => item.id}
+        data={courseGoals}
+        renderItem={itemData => <GoalItem title={itemData.item.value} />}
+      />
     </View>
   );
 }
@@ -50,12 +46,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center"
   },
-  input: {
-    borderColor: "black",
-    width: "80%",
-    borderWidth: 1,
-    padding: 10
-  },
   title: {
     flexDirection: "row",
     justifyContent: "center",
@@ -64,12 +54,5 @@ const styles = StyleSheet.create({
   titleBold: {
     fontWeight: "bold",
     fontSize: 50
-  },
-  listItem: {
-    padding: 10,
-    marginVertical: 10,
-    backgroundColor: "#ccc",
-    borderColor: "black",
-    borderWidth: 1
   }
 });
